@@ -19,6 +19,7 @@ import app.linkbac.fmd.ui.theme.RandomMathTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             val navController = rememberNavController()
 
@@ -28,6 +29,9 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Screen.Home.route) {
                         composable(Screen.Home.route) {
                             Home(navController)
+                        }
+                        composable(Screen.Question.route + "/{questionId}") {
+                            Text(text = "Question")
                         }
                     }
                 }

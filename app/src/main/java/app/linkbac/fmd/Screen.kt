@@ -7,4 +7,5 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Screen(val route: String, @StringRes val resourceId: Int, val icon: ImageVector) {
     object Home : Screen("home", R.string.home, Icons.Default.Home)
+    object Question : Screen("question", R.string.question, Icons.Default.Home)
 }

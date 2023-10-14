@@ -1,5 +1,8 @@
 package app.linkbac.fmd.vm
 
+import android.content.Context
+import android.text.SpannableStringBuilder
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +15,10 @@ import kotlinx.coroutines.launch
 class HomeViewModel: ViewModel() {
     private val _state = mutableStateOf(HomeState())
     val state get() = _state.value
+
+    enum class ContentType {
+        Latex, Text
+    }
 
     fun getQuestions() {
         _state.value = state.copy(isLoading = true)
