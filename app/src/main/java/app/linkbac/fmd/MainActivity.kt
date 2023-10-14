@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.linkbac.fmd.screen.Home
+import app.linkbac.fmd.screen.Scratchpad
 import app.linkbac.fmd.ui.theme.RandomMathTheme
 
 class MainActivity : ComponentActivity() {
@@ -30,8 +31,8 @@ class MainActivity : ComponentActivity() {
                         composable(Screen.Home.route) {
                             Home(navController)
                         }
-                        composable(Screen.Question.route + "/{questionId}") {
-                            Text(text = "Question")
+                        composable(Screen.Scratchpad.route + "/{questionId}") {
+                            Scratchpad(navController)
                         }
                     }
                 }

@@ -5,18 +5,25 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Draw
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -41,6 +48,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.webkit.WebViewAssetLoader
+import app.linkbac.fmd.Screen
 import app.linkbac.fmd.vm.HomeViewModel
 import app.linkbac.fmd.wv.LatexWebView
 
@@ -89,9 +97,6 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                         modifier = Modifier
                             .padding(8.dp)
                             .fillMaxWidth()
-                            .clickable {
-                                navController.navigate("question/${question.questionID}")
-                            }
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp)
@@ -120,6 +125,11 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                                     Text(text = if (answerRevealed) "Hide answer" else "Reveal answer")
                                 }
                                 Spacer(modifier = Modifier.weight(1f))
+                                IconButton(onClick = {
+                                    navController.navigate("${Screen.Scratchpad.route}/${question.questionID}}")
+                                }) {
+                                    Icon(Icons.Filled.Draw, contentDescription = null)
+                                }
                                 IconButton(onClick = {}) {
                                     Icon(Icons.Filled.Flag, contentDescription = null)
                                 }
@@ -133,6 +143,14 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                 )
+                                Row {
+                                    IconButton(onClick = {}) {
+                                        Icon(Icons.Filled.Check, contentDescription = null)
+                                    }
+                                    IconButton(onClick = {}) {
+                                        Icon(Icons.Filled.Close, contentDescription = null)
+                                    }
+                                }
                             }
                         }
                     }

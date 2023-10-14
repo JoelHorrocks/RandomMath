@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">RandomMath</string>
     <string name="home">Home</string>
-    <string name="question">Question</string>
+    <string name="scratchpad">Scratchpad</string>
 </resources>
