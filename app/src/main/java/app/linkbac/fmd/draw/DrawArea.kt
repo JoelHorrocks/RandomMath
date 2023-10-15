@@ -33,10 +33,8 @@ import app.linkbac.fmd.R
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun DrawArea(modifier: Modifier = Modifier, viewModel: StylusViewModel) {
-    val context = LocalContext.current
+fun DrawArea(modifier: Modifier = Modifier, viewModel: StylusViewModel, eraser: Boolean = false) {
     val stylusState by viewModel.stylusState.collectAsState()
-    val strokeStyle = Stroke(width = 8F, cap = StrokeCap.Round, join = StrokeJoin.Round)
 
     Column(
         modifier = modifier
@@ -45,15 +43,21 @@ fun DrawArea(modifier: Modifier = Modifier, viewModel: StylusViewModel) {
         Canvas(modifier = modifier
             .clipToBounds()
             .pointerInteropFilter {
-                viewModel.processMotionEvent(it)
+                viewModel.processMotionEvent(it, eraser)
             }
         ) {
             with(stylusState) {
-                drawPath(
-                    path = this.path,
-                    color = Color(this.color),
-                    style = strokeStyle
-                )
+                for(i in this.paths) {
+                    drawPath(
+                        path = i.path,
+                        color = Color(i.color),
+                        style = Stroke(
+                            width = i.size,
+                            cap = StrokeCap.Round,
+                            join = StrokeJoin.Round
+                        )
+                    )
+                }
             }
         }
     }

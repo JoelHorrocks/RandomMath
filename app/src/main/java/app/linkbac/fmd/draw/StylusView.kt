@@ -1,10 +1,12 @@
 package app.linkbac.fmd.draw
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun StylusView(debug: Boolean = false, stylusViewModel: StylusViewModel = viewModel()) {
+fun StylusView(eraser: Boolean = false, debug: Boolean = false, stylusViewModel: StylusViewModel = viewModel()) {
     val stylusState by stylusViewModel.stylusState.collectAsState()
 
     Column {
@@ -29,6 +31,6 @@ fun StylusView(debug: Boolean = false, stylusViewModel: StylusViewModel = viewMo
                 color = Color.Black,
             )
         }
-        DrawArea(modifier = Modifier.fillMaxSize(), viewModel = stylusViewModel)
+        DrawArea(modifier = Modifier.fillMaxSize(), viewModel = stylusViewModel, eraser)
     }
 }

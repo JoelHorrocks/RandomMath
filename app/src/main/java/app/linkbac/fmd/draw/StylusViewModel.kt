@@ -16,47 +16,67 @@ class StylusViewModel : ViewModel() {
     private var _stylusState = MutableStateFlow(StylusState())
     val stylusState: StateFlow<StylusState> = _stylusState
 
-    private var currentPath = mutableListOf<DrawPoint>()
+    //private var currentPath = mutableListOf<DrawPoint>()
+    // last element in list is current stroke
+    private var strokes = mutableListOf<Stroke>()
 
-    fun createPath(): Path {
-        val path: Path = Path()
-        for(i in currentPath) {
-            if(i.type == DrawPointType.START) {
-                path.moveTo(i.x, i.y)
-            } else {
-                path.lineTo(i.x, i.y)
+    fun createPaths(): List<StrokePath> {
+        val paths: MutableList<StrokePath> = mutableListOf()
+        for (stroke in strokes) {
+            val path = Path()
+            for (i in stroke.drawPoints) {
+                if (i.type == DrawPointType.START) {
+                    path.moveTo(i.x, i.y)
+                } else {
+                    path.lineTo(i.x, i.y)
+                }
             }
+            paths.add(StrokePath(stroke.color, stroke.size, path))
         }
-        return path
+        return paths
     }
 
     private fun cancelLastStroke() {
         // Find the last START event.
-        val lastIndex = currentPath.findLastIndex {
+        val lastIndex = strokes.last().drawPoints.findLastIndex {
             it.type == DrawPointType.START
         }
 
         // If found, keep the element from 0 until the very last event before the last MOVE event.
         if (lastIndex > 0) {
-            currentPath = currentPath.subList(0, lastIndex - 1)
+            strokes.last().drawPoints = strokes.last().drawPoints.subList(0, lastIndex)
         }
     }
 
-    fun processMotionEvent(motionEvent: MotionEvent): Boolean {
-        val isEraser =
-            TOOL_TYPE_ERASER == motionEvent.getToolType(motionEvent.actionIndex) ||
-            motionEvent.buttonState == MotionEvent.BUTTON_STYLUS_PRIMARY
+    fun processMotionEvent(motionEvent: MotionEvent, eraser: Boolean): Boolean {
+        if(strokes.isEmpty()) {
+            strokes.add(Stroke())
+        }
 
-        Log.d("StylusViewModel", "isEraser: $isEraser")
+        if(strokes.last().color == Color.Black.toArgb() && eraser) {
+            strokes.add(
+                Stroke(
+                    size = 20F,
+                    color = Color.White.toArgb()
+                )
+            )
+        } else if(strokes.last().color == Color.White.toArgb() && !eraser) {
+            strokes.add(
+                Stroke(
+                    size = 8F,
+                    color = Color.Black.toArgb()
+                )
+            )
+        }
 
         when (motionEvent.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                currentPath.add(
+                strokes.last().drawPoints.add(
                     DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.START)
                 )
             }
             MotionEvent.ACTION_MOVE -> {
-                currentPath.add(DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.LINE))
+                strokes.last().drawPoints.add(DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.LINE))
             }
             MotionEvent.ACTION_UP -> {
                 val canceled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -65,7 +85,7 @@ class StylusViewModel : ViewModel() {
                 if(canceled) {
                     cancelLastStroke()
                 } else {
-                    currentPath.add(DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.LINE))
+                    strokes.last().drawPoints.add(DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.LINE))
                 }
             }
             MotionEvent.ACTION_CANCEL -> {
@@ -80,8 +100,7 @@ class StylusViewModel : ViewModel() {
                 tilt = motionEvent.getAxisValue(MotionEvent.AXIS_TILT),
                 pressure = motionEvent.pressure,
                 orientation = motionEvent.orientation,
-                color = if (isEraser) Color.Red.toArgb() else Color.Green.toArgb(),
-                path = createPath()
+                paths = createPaths()
             )
         )
 
