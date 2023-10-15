@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import app.linkbac.fmd.screen.Debug
 import app.linkbac.fmd.screen.Home
 import app.linkbac.fmd.screen.Scratchpad
 import app.linkbac.fmd.ui.theme.RandomMathTheme
@@ -33,6 +34,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Screen.Scratchpad.route + "/{questionId}") {
                             Scratchpad(navController)
+                        }
+                        composable(Screen.Debug.route) {
+                            Debug(navController)
                         }
                     }
                 }

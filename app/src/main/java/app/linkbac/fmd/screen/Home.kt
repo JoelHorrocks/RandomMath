@@ -7,6 +7,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,8 +58,9 @@ import app.linkbac.fmd.wv.LatexWebView
 
 @Composable
 fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel()) {
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
-        homeViewModel.getQuestions()
+        homeViewModel.getQuestions(context)
     }
 
     when {
@@ -87,7 +91,18 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                             .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Today's questions", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "Today's questions",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            // Gesture detector to open debug menu
+                            modifier = Modifier.pointerInput(Unit) {
+                                detectDragGesturesAfterLongPress { change, dragAmount ->
+                                    if (dragAmount.y > 20) {
+                                        navController.navigate(Screen.Debug.route)
+                                    }
+                                }
+                            }
+                        )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(text = "\uD83D\uDD25 215")
                     }

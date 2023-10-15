@@ -2,4 +2,5 @@
     <string name="app_name">RandomMath</string>
     <string name="home">Home</string>
     <string name="scratchpad">Scratchpad</string>
+    <string name="debug">Debug</string>
 </resources>
