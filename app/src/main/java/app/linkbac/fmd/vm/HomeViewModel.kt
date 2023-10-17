@@ -26,6 +26,19 @@ class HomeViewModel: ViewModel() {
         Latex, Text
     }
 
+    fun markQuestionResult(context: Context, question: Question, result: Boolean) {
+        // TODO: save to DB
+        _state.value = state.copy(
+            questions = state.questions.map {
+                if(it.uid == question.uid) {
+                    it.copy(attempted = true, correct = result)
+                } else {
+                    it
+                }
+            }
+        )
+    }
+
     fun getQuestions(context: Context) {
         _state.value = state.copy(isLoading = true)
         // check question queue for questions. take 5 questions from queue and if internet is available, get more questions from server
@@ -38,7 +51,7 @@ class HomeViewModel: ViewModel() {
                     val questionEntities = QuestionRepositoryImpl(QuestionApi(ktorHttpClient)).getQuestions()
                     val questionDao = AppDatabase.getInstance(context).questionDao()
                     questionDao.clearQueue()
-                    questionDao.insertAll(*questionEntities.map{
+                    val questionMap = questionEntities.map{
                         Question(
                             uid = it.questionID,
                             question = it.questionText,
@@ -51,28 +64,18 @@ class HomeViewModel: ViewModel() {
                             attempted = false,
                             forDay = dateString(Calendar.getInstance().time)
                         )
-                    }.toTypedArray())
+                    }
+                    questionDao.insertAll(*questionMap.toTypedArray())
                     viewModelScope.launch(Dispatchers.Main) {
-                        _state.value = state.copy(isLoading = false, questions = questionEntities.take(5))
+                        _state.value = state.copy(isLoading = false, questions = questionMap.take(5))
                     }
 
                 } else {
                     viewModelScope.launch(Dispatchers.Main) {
-                    val questionEntities = questions.filter {
+                    val questions = questions.filter {
                         it.forDay.toString() == dateString(Calendar.getInstance().time)
-                    }.take(5).map {
-                            QuestionEntity(
-                                questionID = it.uid,
-                                questionText = it.question,
-                                answerText = it.answer,
-                                topic = it.topic,
-                                difficulty = it.difficulty,
-                                examStyle = it.examStyle,
-                                marks = it.marks,
-                                createdAt = it.createdAt
-                            )
-                        }
-                        _state.value = state.copy(isLoading = false, questions = questionEntities)
+                    }.take(5)
+                        _state.value = state.copy(isLoading = false, questions = questions)
                     }
                 }
             }

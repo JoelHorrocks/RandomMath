@@ -40,11 +40,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -126,7 +129,7 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                             }
                             AndroidView(
                                 factory = { context ->
-                                    LatexWebView(context, question.questionText)
+                                    LatexWebView(context, question.question)
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -141,7 +144,7 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                                 }
                                 Spacer(modifier = Modifier.weight(1f))
                                 IconButton(onClick = {
-                                    navController.navigate("${Screen.Scratchpad.route}/${question.questionID}}")
+                                    navController.navigate("${Screen.Scratchpad.route}/${question.uid}")
                                 }) {
                                     Icon(Icons.Filled.Draw, contentDescription = null)
                                 }
@@ -153,21 +156,38 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                                 Spacer(modifier = Modifier.height(8.dp))
                                 AndroidView(
                                     factory = { context ->
-                                        LatexWebView(context, question.answerText)
+                                        LatexWebView(context, question.answer)
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                 )
                                 Row {
-                                    IconButton(onClick = {}) {
-                                        Icon(Icons.Filled.Check, contentDescription = null)
+                                    IconButton(onClick = {
+                                        homeViewModel.markQuestionResult(context, question, true)
+                                    }) {
+                                        Icon(Icons.Filled.Check, contentDescription = null, tint = if(question.correct && question.attempted) Color(0xFF388E3C) else Color.Gray)
                                     }
-                                    IconButton(onClick = {}) {
-                                        Icon(Icons.Filled.Close, contentDescription = null)
+                                    IconButton(onClick = {
+                                        homeViewModel.markQuestionResult(context, question, false)
+                                    }) {
+                                        Icon(Icons.Filled.Close, contentDescription = null, tint = if(!question.correct && question.attempted) Color.Red else Color.Gray)
                                     }
                                 }
                             }
                         }
+                    }
+                }
+                item{
+                    if(homeViewModel.state.questions.all { it.attempted }) {
+                        Text("You've completed all your questions for today!",
+                            modifier = Modifier.padding(16.dp),
+                            fontSize = 18.sp
+                        )
+                    } else {
+                        Text("Mark your answers to complete the questions for today",
+                            modifier = Modifier.padding(16.dp),
+                            fontSize = 18.sp
+                        )
                     }
                 }
             }
