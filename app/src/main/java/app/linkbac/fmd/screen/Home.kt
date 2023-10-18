@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -46,6 +47,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -57,6 +60,7 @@ import androidx.webkit.WebViewAssetLoader
 import app.linkbac.fmd.Screen
 import app.linkbac.fmd.vm.HomeViewModel
 import app.linkbac.fmd.wv.LatexWebView
+import com.himamis.retex.renderer.android.LaTeXView
 
 
 @Composable
@@ -127,12 +131,12 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                                 Spacer(modifier = Modifier.weight(1f))
                                 Text(text = question.difficulty)
                             }
-                            AndroidView(
-                                factory = { context ->
-                                    LatexWebView(context, question.question)
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
+                            val density = LocalDensity.current
+                            val latexString = homeViewModel.latexToAnnotatedString(context, question.question, density)
+                            Text(
+                                latexString.first,
+                                inlineContent = latexString.second,
+                                lineHeight = 32.sp,
                             )
                             Row(
                                 modifier = Modifier.padding(top = 8.dp)
@@ -154,13 +158,9 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                             }
                             if (answerRevealed) {
                                 Spacer(modifier = Modifier.height(8.dp))
-                                AndroidView(
-                                    factory = { context ->
-                                        LatexWebView(context, question.answer)
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                )
+                                val density = LocalDensity.current
+                                val latexString = homeViewModel.latexToAnnotatedString(context, question.answer, density)
+                                Text(latexString.first, inlineContent = latexString.second)
                                 Row {
                                     IconButton(onClick = {
                                         homeViewModel.markQuestionResult(context, question, true)
