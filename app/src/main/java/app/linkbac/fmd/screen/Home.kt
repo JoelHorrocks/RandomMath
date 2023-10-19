@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -112,9 +113,11 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                             }
                         )
                         Spacer(modifier = Modifier.weight(1f))
-                        Text(text = "\uD83D\uDD25", modifier = Modifier.drawBehind {
-                            drawCircle(Color(0xFFFFD978), radius = (size.minDimension / 2F))
-                        }.padding(2.dp)
+                        Text(text = "\uD83D\uDD25", modifier = Modifier
+                            .drawBehind {
+                                drawCircle(Color(0xFFFFD978), radius = (size.minDimension / 2F))
+                            }
+                            .padding(2.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = "215", fontSize = 18.sp)
@@ -175,7 +178,10 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                             }
                             if (answerRevealed) {
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Text(question.answerAnnotatedString.first, inlineContent = question.answerAnnotatedString.second)
+                                Text(
+                                    question.answerAnnotatedString.first,
+                                    inlineContent = question.answerAnnotatedString.second
+                                )
                                 Row {
                                     IconButton(onClick = {
                                         homeViewModel.markQuestionResult(context, question, true)
@@ -196,15 +202,45 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                 }
                 item{
                     if(homeViewModel.state.questions.all { it.question.attempted }) {
-                        Text("\uD83C\uDFAF You've completed all your questions for today!",
-                            modifier = Modifier.padding(16.dp),
-                            fontSize = 18.sp
-                        )
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                "\uD83C\uDFAF",
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                "You've completed all your questions for today!",
+                                fontSize = 18.sp,
+                                textAlign = TextAlign.Center,
+                                color = Color.Gray
+                            )
+                        }
                     } else {
-                        Text("\uD83E\uDD14 Mark your answers to complete the questions for today",
-                            modifier = Modifier.padding(16.dp),
-                            fontSize = 18.sp
-                        )
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                "\uD83E\uDD14",
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                "Mark your answers to complete the questions for today",
+                                fontSize = 18.sp,
+                                textAlign = TextAlign.Center,
+                                color = Color.Gray
+                            )
+                        }
                     }
                 }
             }
