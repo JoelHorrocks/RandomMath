@@ -38,7 +38,6 @@ import app.linkbac.fmd.db.AppDatabase
 import app.linkbac.fmd.db.Question
 import app.linkbac.fmd.draw.StylusView
 import app.linkbac.fmd.utils.dateString
-import app.linkbac.fmd.wv.LatexWebView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Calendar

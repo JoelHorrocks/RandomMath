@@ -17,4 +17,5 @@ data class Question(
     val forDay: String? = null,
     val attempted: Boolean = false,
     val correct: Boolean = false,
+    val flagged: Boolean = false,
 )

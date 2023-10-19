@@ -2,15 +2,18 @@ package app.linkbac.fmd.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddTask
@@ -34,6 +37,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -45,8 +49,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import app.linkbac.fmd.R
 import app.linkbac.fmd.draw.StylusView
+import app.linkbac.fmd.utils.latexToAnnotatedString
 import app.linkbac.fmd.vm.ScratchpadViewModel
-import app.linkbac.fmd.wv.LatexWebView
 
 @Composable
 fun Scratchpad(navController: NavController, id: String?, scratchpadViewModel: ScratchpadViewModel = viewModel()) {
@@ -100,6 +104,8 @@ fun Scratchpad(navController: NavController, id: String?, scratchpadViewModel: S
                         Card(
                             modifier = Modifier
                                 .padding(8.dp)
+                                .fillMaxWidth(0.7F)
+                                .zIndex(1f),
                         ) {
                             Text(
                                 text = "Answer:",
@@ -107,13 +113,16 @@ fun Scratchpad(navController: NavController, id: String?, scratchpadViewModel: S
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(16.dp)
                             )
-                            AndroidView(
-                                factory = { context ->
-                                    LatexWebView(context, scratchpadViewModel.question.value?.answer ?: "")
-                                },
+                            val density = LocalDensity.current
+                            val latexString = latexToAnnotatedString(context, scratchpadViewModel.question.value?.answer ?: "", density)
+                            val scrollState = rememberScrollState()
+                            Text(
+                                latexString.first,
+                                inlineContent = latexString.second,
+                                lineHeight = 32.sp,
                                 modifier = Modifier
                                     .padding(16.dp)
-                                    .width(240.dp)
+                                    .horizontalScroll(scrollState)
                             )
                             Row {
                                 IconButton(onClick = {
@@ -158,13 +167,15 @@ fun Scratchpad(navController: NavController, id: String?, scratchpadViewModel: S
                 color = Color.White
             )) {
             if(scratchpadViewModel.question.value != null) {
-                AndroidView(
-                    factory = { context ->
-                        LatexWebView(context, scratchpadViewModel.question.value!!.question)
-                    },
+                val density = LocalDensity.current
+                val latexString = latexToAnnotatedString(context, scratchpadViewModel.question.value?.question ?: "", density)
+                Text(
+                    latexString.first,
+                    inlineContent = latexString.second,
+                    lineHeight = 32.sp,
                     modifier = Modifier
+                        .fillMaxWidth()
                         .padding(16.dp)
-                        .zIndex(1f)
                 )
             }
             StylusView(eraser)

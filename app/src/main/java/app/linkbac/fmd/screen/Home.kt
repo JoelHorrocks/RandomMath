@@ -32,6 +32,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,16 +59,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.webkit.WebViewAssetLoader
 import app.linkbac.fmd.Screen
+import app.linkbac.fmd.utils.latexToAnnotatedString
 import app.linkbac.fmd.vm.HomeViewModel
-import app.linkbac.fmd.wv.LatexWebView
-import com.himamis.retex.renderer.android.LaTeXView
 
 
 @Composable
 fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel()) {
     val context = LocalContext.current
+    val density = LocalDensity.current
     LaunchedEffect(Unit) {
-        homeViewModel.getQuestions(context)
+        homeViewModel.getQuestions(context, density)
     }
 
     when {
@@ -111,7 +112,12 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                             }
                         )
                         Spacer(modifier = Modifier.weight(1f))
-                        Text(text = "\uD83D\uDD25 215")
+                        Text(text = "\uD83D\uDD25", modifier = Modifier.drawBehind {
+                            drawCircle(Color(0xFFFFD978), radius = (size.minDimension / 2F))
+                        }.padding(2.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "215", fontSize = 18.sp)
                     }
                 }
                 items(homeViewModel.state.questions) { question ->
@@ -127,15 +133,24 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                             Row(
                                 modifier = Modifier.padding(bottom = 8.dp)
                             ) {
-                                Text(text = question.topic, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                if(question.question.correct && question.question.attempted) {
+                                    Icon(Icons.Filled.Check, modifier = Modifier.drawBehind {
+                                        drawCircle(Color(0xFFABE294), radius = (size.minDimension / 2F))
+                                    }, contentDescription = null, tint = Color(0xFF38B63E))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                } else if(!question.question.correct && question.question.attempted) {
+                                    Icon(Icons.Filled.Close, modifier = Modifier.drawBehind {
+                                        drawCircle(Color(0xFFEB9C9C), radius = (size.minDimension / 2F))
+                                    }, contentDescription = null, tint = Color(0xFFB63838))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text(text = question.question.topic, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.weight(1f))
-                                Text(text = question.difficulty)
+                                Text(text = question.question.difficulty)
                             }
-                            val density = LocalDensity.current
-                            val latexString = homeViewModel.latexToAnnotatedString(context, question.question, density)
                             Text(
-                                latexString.first,
-                                inlineContent = latexString.second,
+                                question.questionAnnotatedString.first,
+                                inlineContent = question.questionAnnotatedString.second,
                                 lineHeight = 32.sp,
                             )
                             Row(
@@ -148,29 +163,31 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                                 }
                                 Spacer(modifier = Modifier.weight(1f))
                                 IconButton(onClick = {
-                                    navController.navigate("${Screen.Scratchpad.route}/${question.uid}")
+                                    navController.navigate("${Screen.Scratchpad.route}/${question.question.uid}")
                                 }) {
                                     Icon(Icons.Filled.Draw, contentDescription = null)
                                 }
-                                IconButton(onClick = {}) {
-                                    Icon(Icons.Filled.Flag, contentDescription = null)
+                                IconButton(onClick = {
+                                    homeViewModel.flagQuestion(question, !question.question.flagged)
+                                }) {
+                                    Icon(Icons.Filled.Flag, contentDescription = null, tint = if (question.question.flagged) Color(0xFFB63838) else LocalContentColor.current)
                                 }
                             }
                             if (answerRevealed) {
                                 Spacer(modifier = Modifier.height(8.dp))
-                                val density = LocalDensity.current
-                                val latexString = homeViewModel.latexToAnnotatedString(context, question.answer, density)
-                                Text(latexString.first, inlineContent = latexString.second)
+                                Text(question.answerAnnotatedString.first, inlineContent = question.answerAnnotatedString.second)
                                 Row {
                                     IconButton(onClick = {
                                         homeViewModel.markQuestionResult(context, question, true)
                                     }) {
-                                        Icon(Icons.Filled.Check, contentDescription = null, tint = if(question.correct && question.attempted) Color(0xFF388E3C) else Color.Gray)
+                                        Icon(Icons.Filled.Check, contentDescription = null, tint = if(question.question.correct && question.question.attempted) Color(
+                                            0xFF38B63E
+                                        ) else Color.Gray)
                                     }
                                     IconButton(onClick = {
                                         homeViewModel.markQuestionResult(context, question, false)
                                     }) {
-                                        Icon(Icons.Filled.Close, contentDescription = null, tint = if(!question.correct && question.attempted) Color.Red else Color.Gray)
+                                        Icon(Icons.Filled.Close, contentDescription = null, tint = if(!question.question.correct && question.question.attempted) Color(0xFFB63838) else Color.Gray)
                                     }
                                 }
                             }
@@ -178,13 +195,13 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                     }
                 }
                 item{
-                    if(homeViewModel.state.questions.all { it.attempted }) {
-                        Text("You've completed all your questions for today!",
+                    if(homeViewModel.state.questions.all { it.question.attempted }) {
+                        Text("\uD83C\uDFAF You've completed all your questions for today!",
                             modifier = Modifier.padding(16.dp),
                             fontSize = 18.sp
                         )
                     } else {
-                        Text("Mark your answers to complete the questions for today",
+                        Text("\uD83E\uDD14 Mark your answers to complete the questions for today",
                             modifier = Modifier.padding(16.dp),
                             fontSize = 18.sp
                         )
