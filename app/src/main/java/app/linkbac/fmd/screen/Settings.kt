@@ -17,7 +17,9 @@ import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ConnectWithoutContact
 import androidx.compose.material.icons.filled.EmojiEmotions
+import androidx.compose.material.icons.filled.Hardware
 import androidx.compose.material.icons.filled.HourglassTop
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.ShapeLine
 import androidx.compose.material3.Divider
@@ -28,6 +30,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,9 +42,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import app.linkbac.fmd.vm.SettingsViewModel
 
 @Composable
-fun Settings() {
+fun Settings(settingsViewModel: SettingsViewModel = viewModel()) {
     Column(
         modifier = Modifier.padding(horizontal = 8.dp)
     ) {
@@ -60,15 +65,29 @@ fun Settings() {
                 fontWeight = FontWeight.Medium
             )
         }
-        /*SettingsSwitch(
-            name = "Loading screen messages",
-            desc = "Show loading screen messages",
-            icon = Icons.Filled.HourglassTop,
+        SettingsSwitch(
+            name = "Daily notifications",
+            desc = "Receive daily reminders to practice",
+            icon = Icons.Filled.NotificationsActive,
             iconDesc = "desc",
-            state = settingsViewModel.loadingMessages.collectAsState(),
+            state = settingsViewModel.notificationsEnabled.collectAsState(),
         ) {
             //settingsViewModel.saveLoadingMessages(it, context)
-        }*/
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(modifier = Modifier.padding(vertical = 8.dp)) {
+            Text(
+                "About",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+        SettingsItem(
+            name = "Version",
+            desc = "1.0.0",
+            icon = Icons.Filled.Code,
+            iconDesc = "desc"
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Row(modifier = Modifier.padding(vertical = 8.dp)) {
             Text(

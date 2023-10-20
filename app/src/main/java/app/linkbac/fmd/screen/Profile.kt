@@ -1,5 +1,7 @@
 package app.linkbac.fmd.screen
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +21,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -75,6 +78,45 @@ fun Profile(profileViewModel: ProfileViewModel = viewModel()) {
                 color = Color.Gray
             )
         } else {
+            Text("Maths problem streak",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.height(16.dp))
+            Row {
+                Text(text = "\uD83D\uDD25", modifier = Modifier
+                    .drawBehind {
+                        drawCircle(Color(0xFFFFD978), radius = (size.minDimension / 2F))
+                    }
+                    .padding(2.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "4 days",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                val list = arrayOf("\uD83D\uDE34", "\uD83D\uDD25", "\uD83D\uDE34", "\uD83D\uDD25", "\uD83D\uDD25")
+                for(i in list) {
+                    Text(i, modifier = Modifier
+                        .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.small)
+                        .padding(4.dp),
+                        fontSize = 20.sp
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Row {
+                Text("last 5 days")
+                Spacer(modifier = Modifier.weight(1f))
+                Text("today")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             LazyColumn{
                 item {
                     Text("Topics",
