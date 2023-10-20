@@ -172,7 +172,7 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                                     Icon(Icons.Filled.Draw, contentDescription = null)
                                 }
                                 IconButton(onClick = {
-                                    homeViewModel.flagQuestion(question, !question.question.flagged)
+                                    homeViewModel.flagQuestion(context, question, !question.question.flagged)
                                 }) {
                                     Icon(Icons.Filled.Flag, contentDescription = null, tint = if (question.question.flagged) Color(0xFFB63838) else LocalContentColor.current)
                                 }

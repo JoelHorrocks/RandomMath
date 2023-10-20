@@ -75,7 +75,7 @@ class HomeViewModel: ViewModel() {
         }
     }
 
-    fun flagQuestion(question: ProcessedQuestion, flagged: Boolean) {
+    fun flagQuestion(context: Context, question: ProcessedQuestion, flagged: Boolean) {
         _state.value = state.copy(
             questions = state.questions.map {
                 if(it.question.uid == question.question.uid) {
@@ -89,13 +89,21 @@ class HomeViewModel: ViewModel() {
                 }
             }
         )
+
+        viewModelScope.launch(Dispatchers.IO) {
+            AppDatabase.getInstance(context).questionDao().update(
+                state.questions.find {
+                    it.question.uid == question.question.uid
+                }!!.question
+            )
+        }
     }
 
     enum class TextType {
         Latex, Text
     }
 
-    fun processQuestions(questions: List<Question>, context: Context, density: Density): List<ProcessedQuestion> {
+    private fun processQuestions(questions: List<Question>, context: Context, density: Density): List<ProcessedQuestion> {
         val processedQuestions: MutableList<ProcessedQuestion> = mutableListOf()
         for(i in questions) {
             processedQuestions.add(
