@@ -51,7 +51,6 @@ class HomeViewModel: ViewModel() {
     }
 
     fun markQuestionResult(context: Context, question: ProcessedQuestion, result: Boolean) {
-        // TODO: save to DB
         _state.value = state.copy(
             questions = state.questions.map {
                 if(it.question.uid == question.question.uid) {
@@ -66,6 +65,14 @@ class HomeViewModel: ViewModel() {
                 }
             }
         )
+
+        viewModelScope.launch(Dispatchers.IO) {
+            AppDatabase.getInstance(context).questionDao().update(
+                state.questions.find {
+                    it.question.uid == question.question.uid
+                }!!.question
+            )
+        }
     }
 
     fun flagQuestion(question: ProcessedQuestion, flagged: Boolean) {
@@ -106,7 +113,7 @@ class HomeViewModel: ViewModel() {
         _state.value = state.copy(isLoading = true)
         // check question queue for questions. take 5 questions from queue and if internet is available, get more questions from server
         viewModelScope.launch(Dispatchers.IO) {
-            AppDatabase.getInstance(context).questionDao().getUnattempted().let { questions ->
+            AppDatabase.getInstance(context).questionDao().getAll().let { questions ->
                 if(questions.filter{
                     it.forDay.toString() == dateString(Calendar.getInstance().time)
                 }.size < 5) {
@@ -131,17 +138,17 @@ class HomeViewModel: ViewModel() {
                     questionDao.insertAll(*questionMap.toTypedArray())
                     viewModelScope.launch(Dispatchers.Main) {
                         _state.value = state.copy(isLoading = false, questions =
-                         processQuestions(questionMap.take(5), context, density)
+                         processQuestions(questionMap.take(5).sortedBy { it.uid }, context, density)
                         )
                     }
 
                 } else {
                     viewModelScope.launch(Dispatchers.Main) {
-                    val questions = questions.filter {
+                    val filteredQuestions = questions.filter {
                         it.forDay.toString() == dateString(Calendar.getInstance().time)
                     }.take(5)
                         _state.value = state.copy(isLoading = false, questions =
-                            processQuestions(questions, context, density)
+                            processQuestions(filteredQuestions.sortedBy { it.uid }, context, density)
                             )
                     }
                 }

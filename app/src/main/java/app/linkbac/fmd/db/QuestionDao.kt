@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface QuestionDao {
@@ -21,6 +22,9 @@ interface QuestionDao {
 
     @Delete
     fun delete(question: Question)
+
+    @Update
+    fun update(question: Question)
 
     @Query("DELETE FROM question WHERE attempted = 0")
     fun clearQueue()

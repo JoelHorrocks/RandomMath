@@ -26,5 +26,9 @@ class ScratchpadViewModel: ViewModel() {
 
     fun markQuestion(context: Context, result: Boolean) {
         _question.value = _question.value?.copy(attempted = true, correct = result)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            AppDatabase.getInstance(context).questionDao().update(_question.value!!)
+        }
     }
 }

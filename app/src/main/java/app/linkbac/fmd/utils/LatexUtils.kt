@@ -79,7 +79,6 @@ fun latexToBitmap(context: Context, latex: String): Bitmap {
     }
 
     val formula = TeXFormula(latex)
-    //val icon = formula.createTeXIcon(TeXFormula.SERIF, 20.0)
     val builder = formula.TeXIconBuilder()
     val scaleFactor = context.resources.displayMetrics.scaledDensity
     val icon = builder.setSize(20.0 * scaleFactor).setStyle(0).setType(TeXFormula.SERIF).setFGColor(
@@ -89,22 +88,12 @@ fun latexToBitmap(context: Context, latex: String): Bitmap {
     val canvas = Canvas(bitmap)
 
     var mGraphics = Graphics2DA()
-    canvas.drawColor(android.graphics.Color.TRANSPARENT)
+    canvas.drawColor(Color.TRANSPARENT)
 
     // draw latex
     mGraphics.setCanvas(canvas)
     icon.setForeground(ColorA(Color.BLACK))
     icon.paintIcon(null, mGraphics, 0.0, 0.0)
-
-    //val bitmap = Bitmap.createBitmap(icon.iconWidth, icon.iconHeight, Bitmap.Config.ARGB_8888)
-    //canvas.setBitmap(bitmap)
-
-    // save file for debugging
-    val filename = "bitmap.png"
-    val fos = context.openFileOutput(filename, Context.MODE_PRIVATE)
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
-    fos.close()
-    Log.d("HomeViewModel", "bitmap saved to $filename")
 
     return bitmap
 }
