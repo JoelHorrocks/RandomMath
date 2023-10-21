@@ -6,7 +6,13 @@ import io.ktor.client.request.*
 
 class QuestionApi(private val client: HttpClient) {
 
-    suspend fun getQuestions(): List<QuestionEntity> {
+    suspend fun getQuestions(seenQuestionIds: List<Int>): List<QuestionEntity> {
+        val baseUrl = "https://storeimg.com/fmdaily/api.php"
+        val url = if (seenQuestionIds.isEmpty()) {
+            baseUrl
+        } else {
+            "$baseUrl?seenQuestionIDs=${seenQuestionIds.joinToString(",")}"
+        }
         return client.get("https://storeimg.com/fmdaily/api.php").body()
     }
 }

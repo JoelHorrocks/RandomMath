@@ -126,7 +126,10 @@ class HomeViewModel: ViewModel() {
                     it.forDay.toString() == dateString(Calendar.getInstance().time)
                 }.size < 5) {
                     // clear queue and add 5 questions from server
-                    val questionEntities = QuestionRepositoryImpl(QuestionApi(ktorHttpClient)).getQuestions()
+                    val seenQuestions = questions.filter{
+                        it.attempted
+                    }.map { it.uid }
+                    val questionEntities = QuestionRepositoryImpl(QuestionApi(ktorHttpClient)).getQuestions(seenQuestions)
                     val questionDao = AppDatabase.getInstance(context).questionDao()
                     questionDao.clearQueue()
                     val questionMap = questionEntities.map{
