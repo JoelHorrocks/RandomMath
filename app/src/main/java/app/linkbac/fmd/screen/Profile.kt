@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -52,195 +54,228 @@ fun Profile(profileViewModel: ProfileViewModel = viewModel()) {
         profileViewModel.getQuestions(context, density)
     }
 
-    Column(
-        modifier = Modifier.padding(horizontal = 8.dp)
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
     ) {
-        Row(modifier = Modifier
-            .padding(vertical = 16.dp)) {
-            Text(
-                "Profile",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        if(profileViewModel.state.attemptedQuestions.isEmpty()) {
-            Text(
-                "\uD83D\uDD0E",
-                fontSize = 24.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                "Start answering questions to see your stats here!",
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center,
-                color = Color.Gray
-            )
-        } else {
-            Text("Maths problem streak",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium)
-            Spacer(modifier = Modifier.height(16.dp))
-            Row {
-                Text(text = "\uD83D\uDD25", modifier = Modifier
-                    .drawBehind {
-                        drawCircle(Color(0xFFFFD978), radius = (size.minDimension / 2F))
-                    }
-                    .padding(2.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+        item {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+            ) {
                 Text(
-                    "4 days",
+                    "Profile",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                val list = arrayOf("\uD83D\uDE34", "\uD83D\uDD25", "\uD83D\uDE34", "\uD83D\uDD25", "\uD83D\uDD25")
-                for(i in list) {
-                    Text(i, modifier = Modifier
-                        .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.small)
-                        .padding(4.dp),
-                        fontSize = 20.sp
+        }
+        if (profileViewModel.state.attemptedQuestions.isEmpty()) {
+            item {
+                Text(
+                    "\uD83D\uDD0E",
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Start answering questions to see your stats here!",
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray
+                )
+            }
+        } else {
+            item {
+                Text(
+                    "Maths problem streak",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Row {
+                    Text(text = "\uD83D\uDD25", modifier = Modifier
+                        .drawBehind {
+                            drawCircle(Color(0xFFFFD978), radius = (size.minDimension / 2F))
+                        }
+                        .padding(2.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "4 days",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            Row {
-                Text("last 5 days")
-                Spacer(modifier = Modifier.weight(1f))
-                Text("today")
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn{
-                item {
-                    Text("Topics",
-                            fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    val list = arrayOf(
+                        "\uD83D\uDE34",
+                        "\uD83D\uDD25",
+                        "\uD83D\uDE34",
+                        "\uD83D\uDD25",
+                        "\uD83D\uDD25"
+                    )
+                    for (i in list) {
+                        Text(
+                            i, modifier = Modifier
+                                .border(1.dp, Color.Gray, shape = MaterialTheme.shapes.small)
+                                .padding(4.dp),
+                            fontSize = 20.sp
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.height(4.dp))
+                Row {
+                    Text("last 5 days")
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text("today")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "Topics",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Text("\uD83C\uDFAF Aim higher")
+            }
+            items(
+                profileViewModel
+                    .state
+                    .attemptedQuestions
+                    .groupBy { it.question.topic }
+                    .filter { it.value.filter { it.question.correct }.size / it.value.size.toFloat() < 0.5F }
+                    .map { it.key }
+            ) {
+                Text(it)
+            }
+            item {
+                Text("\uD83E\uDD14 On the right track")
+            }
+            items(
+                profileViewModel
+                    .state
+                    .attemptedQuestions
+                    .groupBy { it.question.topic }
+                    .filter {
+                        it.value.filter { it.question.correct }.size / it.value.size.toFloat() >= 0.5F &&
+                                it.value.filter { it.question.correct }.size / it.value.size.toFloat() < 0.75F
+                    }
+                    .map { it.key }
+            ) {
+                Text(it)
+            }
+            item {
+                Text("\uD83C\uDF96️ Great job!")
+            }
+            items(
+                profileViewModel
+                    .state
+                    .attemptedQuestions
+                    .groupBy { it.question.topic }
+                    .filter { it.value.filter { it.question.correct }.size / it.value.size.toFloat() >= 0.75F }
+                    .map { it.key }
+            ) {
+                Text(it)
+            }
+            item {
+                TextButton(onClick = { /*TODO*/ }) {
+                    Text("View all")
+                }
+            }
+            if (profileViewModel.state.attemptedQuestions.any { it.question.flagged }) {
                 item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "Flagged questions",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-                item {
-                    Text("\uD83C\uDFAF Aim higher")
-                }
-                items(
-                    profileViewModel
-                        .state
-                        .attemptedQuestions
-                        .groupBy { it.question.topic }
-                        .filter { it.value.filter {it.question.correct}.size / it.value.size.toFloat() < 0.5F }
-                        .map { it.key }
-                ) {
-                    Text(it)
-                }
-                item {
-                    Text("\uD83E\uDD14 On the right track")
-                }
-                items(
-                    profileViewModel
-                        .state
-                        .attemptedQuestions
-                        .groupBy { it.question.topic }
-                        .filter { it.value.filter { it.question.correct}.size / it.value.size.toFloat() >= 0.5F &&
-                                it.value.filter {it.question.correct}.size / it.value.size.toFloat() < 0.75F }
-                        .map { it.key }
-                ) {
-                    Text(it)
-                }
-                item {
-                    Text("\uD83C\uDF96️ Great job!")
-                }
-                items(
-                    profileViewModel
-                        .state
-                        .attemptedQuestions
-                        .groupBy { it.question.topic }
-                        .filter { it.value.filter { it.question.correct}.size / it.value.size.toFloat() >= 0.75F }
-                        .map { it.key }
-                ) {
-                    Text(it)
+                items(profileViewModel.state.attemptedQuestions.filter { it.question.flagged }
+                    .take(2)) { question ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            ) {
+                                if (question.question.correct && question.question.attempted) {
+                                    Icon(Icons.Filled.Check, modifier = Modifier.drawBehind {
+                                        drawCircle(
+                                            Color(0xFFABE294),
+                                            radius = (size.minDimension / 2F)
+                                        )
+                                    }, contentDescription = null, tint = Color(0xFF38B63E))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                } else if (!question.question.correct && question.question.attempted) {
+                                    Icon(Icons.Filled.Close, modifier = Modifier.drawBehind {
+                                        drawCircle(
+                                            Color(0xFFEB9C9C),
+                                            radius = (size.minDimension / 2F)
+                                        )
+                                    }, contentDescription = null, tint = Color(0xFFB63838))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                }
+                                Text(
+                                    text = question.question.topic,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(text = question.question.difficulty)
+                            }
+                            Text(
+                                question.questionAnnotatedString.first,
+                                inlineContent = question.questionAnnotatedString.second,
+                                lineHeight = 32.sp,
+                            )
+                            if (question.question.forDay != null) {
+                                Text(
+                                    question.question.forDay,
+                                )
+                            }
+                            var answerRevealed by rememberSaveable { mutableStateOf(false) }
+                            Row(
+                                modifier = Modifier.padding(top = 8.dp)
+                            ) {
+                                Button(onClick = {
+                                    answerRevealed = !answerRevealed
+                                }) {
+                                    Text(text = if (answerRevealed) "Hide answer" else "Reveal answer")
+                                }
+                            }
+                            if (answerRevealed) {
+                                Text(
+                                    question.answerAnnotatedString.first,
+                                    inlineContent = question.answerAnnotatedString.second,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
+                            }
+                        }
+                    }
                 }
                 item {
                     TextButton(onClick = { /*TODO*/ }) {
                         Text("View all")
-                    }
-                }
-            }
-            if(profileViewModel.state.attemptedQuestions.any { it.question.flagged }) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("Flagged questions",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium)
-                Spacer(modifier = Modifier.height(8.dp))
-                LazyColumn {
-                    items(profileViewModel.state.attemptedQuestions.filter { it.question.flagged }
-                        .take(2)) { question ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        )  {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(bottom = 8.dp)
-                                ) {
-                                    if(question.question.correct && question.question.attempted) {
-                                        Icon(Icons.Filled.Check, modifier = Modifier.drawBehind {
-                                            drawCircle(Color(0xFFABE294), radius = (size.minDimension / 2F))
-                                        }, contentDescription = null, tint = Color(0xFF38B63E))
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    } else if(!question.question.correct && question.question.attempted) {
-                                        Icon(Icons.Filled.Close, modifier = Modifier.drawBehind {
-                                            drawCircle(Color(0xFFEB9C9C), radius = (size.minDimension / 2F))
-                                        }, contentDescription = null, tint = Color(0xFFB63838))
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    }
-                                    Text(text = question.question.topic, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Text(text = question.question.difficulty)
-                                }
-                                Text(
-                                    question.questionAnnotatedString.first,
-                                    inlineContent = question.questionAnnotatedString.second,
-                                    lineHeight = 32.sp,
-                                )
-                                if (question.question.forDay != null) {
-                                    Text(
-                                        question.question.forDay,
-                                    )
-                                }
-                                var answerRevealed by rememberSaveable { mutableStateOf(false) }
-                                Row(
-                                    modifier = Modifier.padding(top = 8.dp)
-                                ) {
-                                    Button(onClick = {
-                                        answerRevealed = !answerRevealed
-                                    }) {
-                                        Text(text = if (answerRevealed) "Hide answer" else "Reveal answer")
-                                    }
-                                }
-                                if (answerRevealed) {
-                                    Text(
-                                        question.answerAnnotatedString.first,
-                                        inlineContent = question.answerAnnotatedString.second,
-                                        fontSize = 18.sp,
-                                        modifier = Modifier.padding(top = 8.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    item {
-                        TextButton(onClick = { /*TODO*/ }) {
-                            Text("View all")
-                        }
                     }
                 }
             }
