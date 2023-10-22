@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -51,6 +52,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +62,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.webkit.WebViewAssetLoader
+import app.linkbac.fmd.R
 import app.linkbac.fmd.Screen
 import app.linkbac.fmd.utils.latexToAnnotatedString
 import app.linkbac.fmd.vm.HomeViewModel
@@ -114,11 +117,15 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                             }
                         )
                         Spacer(modifier = Modifier.weight(1f))
-                        Text(text = "\uD83D\uDD25", modifier = Modifier
-                            .drawBehind {
-                                drawCircle(Color(0xFFFFD978), radius = (size.minDimension / 2F))
-                            }
-                            .padding(2.dp)
+                        Icon(painter = painterResource(id = R.drawable.ic_fire_24),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(26.dp)
+                                .drawBehind {
+                                    drawCircle(Color(0xFFFFD978), radius = (size.minDimension / 2F))
+                                }
+                                .padding(2.dp),
+                            tint = Color.Unspecified
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(text = "215", fontSize = 18.sp)

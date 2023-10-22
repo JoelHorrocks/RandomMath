@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ConnectWithoutContact
 import androidx.compose.material.icons.filled.EmojiEmotions
+import androidx.compose.material.icons.filled.EmojiSymbols
 import androidx.compose.material.icons.filled.Hardware
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.NotificationsActive
@@ -101,6 +102,12 @@ fun Settings(settingsViewModel: SettingsViewModel = viewModel()) {
                 fontWeight = FontWeight.Medium
             )
         }
+        SettingsItem(
+            name = "Noto Emoji",
+            desc = "Apache-2.0, Google",
+            icon = Icons.Filled.EmojiSymbols,
+            iconDesc = "desc"
+        )
         SettingsItem(
             name = "Twemoji",
             desc = "CC-BY 4.0, Copyright 2020 Twitter, Inc and other contributors",
