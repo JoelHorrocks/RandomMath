@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import app.linkbac.fmd.ProcessedQuestion
 import app.linkbac.fmd.db.AppDatabase
 import app.linkbac.fmd.db.Question
+import app.linkbac.fmd.http.ApiResponse
 import app.linkbac.fmd.http.QuestionApi
 import app.linkbac.fmd.http.QuestionRepositoryImpl
 import app.linkbac.fmd.http.ktorHttpClient
@@ -130,27 +131,37 @@ class HomeViewModel: ViewModel() {
                         it.attempted
                     }.map { it.uid }
                     val questionEntities = QuestionRepositoryImpl(QuestionApi(ktorHttpClient)).getQuestions(seenQuestions)
-                    val questionDao = AppDatabase.getInstance(context).questionDao()
-                    questionDao.clearQueue()
-                    val questionMap = questionEntities.map{
-                        Question(
-                            uid = it.questionID,
-                            question = it.questionText,
-                            answer = it.answerText,
-                            topic = it.topic,
-                            difficulty = it.difficulty,
-                            examStyle = it.examStyle,
-                            marks = it.marks,
-                            createdAt = it.createdAt,
-                            attempted = false,
-                            forDay = dateString(Calendar.getInstance().time)
-                        )
-                    }
-                    questionDao.insertAll(*questionMap.toTypedArray())
-                    viewModelScope.launch(Dispatchers.Main) {
-                        _state.value = state.copy(isLoading = false, questions =
-                         processQuestions(questionMap.take(5).sortedBy { it.uid }, context, density)
-                        )
+                    when(questionEntities) {
+                        is ApiResponse.Success -> {
+                            val questionDao = AppDatabase.getInstance(context).questionDao()
+                            questionDao.clearQueue()
+                            val questionMap = questionEntities.body.map{
+                                Question(
+                                    uid = it.questionID,
+                                    question = it.questionText,
+                                    answer = it.answerText,
+                                    topic = it.topic,
+                                    difficulty = it.difficulty,
+                                    examStyle = it.examStyle,
+                                    marks = it.marks,
+                                    createdAt = it.createdAt,
+                                    attempted = false,
+                                    forDay = dateString(Calendar.getInstance().time)
+                                )
+                            }
+                            questionDao.insertAll(*questionMap.toTypedArray())
+                            viewModelScope.launch(Dispatchers.Main) {
+                                _state.value = state.copy(isLoading = false, questions =
+                                processQuestions(questionMap.take(5).sortedBy { it.uid }, context, density)
+                                )
+                            }
+                        }
+                        else -> {
+                            viewModelScope.launch(Dispatchers.Main) {
+                                // TODO: read from disk cache
+                                _state.value = state.copy(isLoading = false, error = "Error getting questions")
+                            }
+                        }
                     }
 
                 } else {

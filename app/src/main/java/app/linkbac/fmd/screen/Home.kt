@@ -29,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Draw
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -92,7 +93,17 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
         }
 
         homeViewModel.state.error.isNotBlank() -> {
-            Text(text = homeViewModel.state.error)
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth().fillMaxHeight()
+            ) {
+                Icon(
+                    Icons.Default.Error,
+                    contentDescription = null,
+                )
+                Text(text = homeViewModel.state.error)
+            }
         }
 
         else -> {

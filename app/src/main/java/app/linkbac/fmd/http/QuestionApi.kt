@@ -1,18 +1,22 @@
 package app.linkbac.fmd.http
 
+import android.util.Log
 import io.ktor.client.*
-import io.ktor.client.call.body
-import io.ktor.client.request.*
+import io.ktor.http.URLProtocol
+import io.ktor.http.path
 
 class QuestionApi(private val client: HttpClient) {
 
-    suspend fun getQuestions(seenQuestionIds: List<Int>): List<QuestionEntity> {
-        val baseUrl = "https://storeimg.com/fmdaily/api-app.php"
-        val url = if (seenQuestionIds.isEmpty()) {
-            baseUrl
-        } else {
-            "$baseUrl?seenQuestionIDs=${seenQuestionIds.joinToString(",")}"
+    suspend fun getQuestions(seenQuestionIds: List<Int>): ApiResponse<List<QuestionEntity>, Any> {
+        return client.safeRequest {
+            this.url {
+                protocol = URLProtocol.HTTPS
+                host = "storeimg.com"
+                path("fmdaily", "api-app.php")
+                if(seenQuestionIds.isNotEmpty()) {
+                    parameters.append("seenQuestionIDs", seenQuestionIds.joinToString(","))
+                }
+            }
         }
-        return client.get(url).body()
     }
 }
