@@ -66,6 +66,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import app.linkbac.fmd.Screen
 import app.linkbac.fmd.component.gridItems
 import app.linkbac.fmd.utils.getTopicIcon
@@ -74,7 +75,7 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 @Composable
-fun Profile(profileViewModel: ProfileViewModel = viewModel()) {
+fun Profile(navController: NavController, profileViewModel: ProfileViewModel = viewModel()) {
     val context = LocalContext.current
     val density = LocalDensity.current
 
@@ -251,9 +252,9 @@ fun Profile(profileViewModel: ProfileViewModel = viewModel()) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
             val extraItems = listOf(
-                Pair(Icons.Default.Flag, "Flagged questions"),
-                Pair(Icons.Default.History, "Past questions"),
-                Pair(Icons.Default.StackedLineChart, "Answer stats"),
+                Triple(Icons.Default.Flag, "Flagged questions") { navController.navigate(Screen.FlaggedQuestions.route) },
+                Triple(Icons.Default.History, "Past questions") { navController.navigate(Screen.PastQuestions.route) },
+                Triple(Icons.Default.StackedLineChart, "Answer stats") { navController.navigate(Screen.Stats.route) },
             )
             gridItems(extraItems.size, nColumns = 3) { index ->
                 SubmenuCard(extraItems[index])
@@ -296,13 +297,15 @@ fun TopicsCard(item: Pair<String, Float>) {
 }
 
 @Composable
-fun SubmenuCard(item: Pair<ImageVector, String>) {
+fun SubmenuCard(item: Triple<ImageVector, String, () -> Unit>) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 4.dp)
             .clip(MaterialTheme.shapes.medium)
-            .clickable { },
+            .clickable {
+                item.third()
+            },
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

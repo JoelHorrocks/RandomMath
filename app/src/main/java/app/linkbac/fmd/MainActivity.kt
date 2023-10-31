@@ -25,10 +25,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.linkbac.fmd.screen.Debug
+import app.linkbac.fmd.screen.FlaggedQuestions
 import app.linkbac.fmd.screen.Home
+import app.linkbac.fmd.screen.PastQuestions
 import app.linkbac.fmd.screen.Profile
 import app.linkbac.fmd.screen.Scratchpad
 import app.linkbac.fmd.screen.Settings
+import app.linkbac.fmd.screen.Stats
 import app.linkbac.fmd.ui.theme.RandomMathTheme
 
 class MainActivity : ComponentActivity() {
@@ -82,7 +85,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                ) {
+                ) { it ->
                     Surface(
                         modifier = Modifier
                             .padding(it)
@@ -97,13 +100,22 @@ class MainActivity : ComponentActivity() {
                                 Home(navController)
                             }
                             composable(Screen.Profile.route) {
-                                Profile()
+                                Profile(navController)
                             }
                             composable(Screen.Settings.route) {
                                 Settings()
                             }
-                            composable(Screen.Scratchpad.route + "/{questionId}") {
-                                Scratchpad(navController, it.arguments?.getString("questionId"))
+                            composable(Screen.FlaggedQuestions.route) {
+                                FlaggedQuestions(navController)
+                            }
+                            composable(Screen.PastQuestions.route) {
+                                PastQuestions(navController)
+                            }
+                            composable(Screen.Stats.route) {
+                                Stats(navController)
+                            }
+                            composable(Screen.Scratchpad.route + "/{questionId}") { navBackStackEntry ->
+                                Scratchpad(navController, navBackStackEntry.arguments?.getString("questionId"))
                             }
                             composable(Screen.Debug.route) {
                                 Debug(navController)

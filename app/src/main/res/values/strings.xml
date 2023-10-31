@@ -3,6 +3,9 @@
     <string name="home">Home</string>
     <string name="profile">Profile</string>
     <string name="settings">Settings</string>
+    <string name="flagged_questions">Flagged questions</string>
+    <string name="past_questions">Past questions</string>
+    <string name="stats">Stats</string>
     <string name="scratchpad">Scratchpad</string>
     <string name="debug">Debug</string>
 </resources>

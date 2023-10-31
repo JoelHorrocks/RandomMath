@@ -63,6 +63,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.webkit.WebViewAssetLoader
+import app.linkbac.fmd.ProcessedQuestion
 import app.linkbac.fmd.R
 import app.linkbac.fmd.Screen
 import app.linkbac.fmd.utils.latexToAnnotatedString
@@ -143,81 +144,7 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
                     }
                 }
                 items(homeViewModel.state.questions) { question ->
-                    Card(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            var answerRevealed by rememberSaveable { mutableStateOf(false) }
-                            Row(
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            ) {
-                                if(question.question.correct && question.question.attempted) {
-                                    Icon(Icons.Filled.Check, modifier = Modifier.drawBehind {
-                                        drawCircle(Color(0xFFABE294), radius = (size.minDimension / 2F))
-                                    }, contentDescription = null, tint = Color(0xFF38B63E))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                } else if(!question.question.correct && question.question.attempted) {
-                                    Icon(Icons.Filled.Close, modifier = Modifier.drawBehind {
-                                        drawCircle(Color(0xFFEB9C9C), radius = (size.minDimension / 2F))
-                                    }, contentDescription = null, tint = Color(0xFFB63838))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                }
-                                Text(text = question.question.topic, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(text = question.question.difficulty)
-                            }
-                            Text(
-                                question.questionAnnotatedString.first,
-                                inlineContent = question.questionAnnotatedString.second,
-                                lineHeight = 32.sp,
-                            )
-                            Row(
-                                modifier = Modifier.padding(top = 8.dp)
-                            ) {
-                                Button(onClick = {
-                                    answerRevealed = !answerRevealed
-                                }) {
-                                    Text(text = if (answerRevealed) "Hide answer" else "Reveal answer")
-                                }
-                                Spacer(modifier = Modifier.weight(1f))
-                                IconButton(onClick = {
-                                    navController.navigate("${Screen.Scratchpad.route}/${question.question.uid}")
-                                }) {
-                                    Icon(Icons.Filled.Draw, contentDescription = null)
-                                }
-                                IconButton(onClick = {
-                                    homeViewModel.flagQuestion(context, question, !question.question.flagged)
-                                }) {
-                                    Icon(Icons.Filled.Flag, contentDescription = null, tint = if (question.question.flagged) Color(0xFFB63838) else LocalContentColor.current)
-                                }
-                            }
-                            if (answerRevealed) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    question.answerAnnotatedString.first,
-                                    inlineContent = question.answerAnnotatedString.second
-                                )
-                                Row {
-                                    IconButton(onClick = {
-                                        homeViewModel.markQuestionResult(context, question, true)
-                                    }) {
-                                        Icon(Icons.Filled.Check, contentDescription = null, tint = if(question.question.correct && question.question.attempted) Color(
-                                            0xFF38B63E
-                                        ) else Color.Gray)
-                                    }
-                                    IconButton(onClick = {
-                                        homeViewModel.markQuestionResult(context, question, false)
-                                    }) {
-                                        Icon(Icons.Filled.Close, contentDescription = null, tint = if(!question.question.correct && question.question.attempted) Color(0xFFB63838) else Color.Gray)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    QuestionCard(question, navController, homeViewModel)
                 }
                 item{
                     if(homeViewModel.state.questions.all { it.question.attempted }) {
@@ -265,5 +192,84 @@ fun Home(navController: NavController, homeViewModel: HomeViewModel = viewModel(
             }
         }
     }
+}
 
+@Composable
+fun QuestionCard(question: ProcessedQuestion, navController: NavController, homeViewModel: HomeViewModel) {
+    val context = LocalContext.current
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            var answerRevealed by rememberSaveable { mutableStateOf(false) }
+            Row(
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                if(question.question.correct && question.question.attempted) {
+                    Icon(Icons.Filled.Check, modifier = Modifier.drawBehind {
+                        drawCircle(Color(0xFFABE294), radius = (size.minDimension / 2F))
+                    }, contentDescription = null, tint = Color(0xFF38B63E))
+                    Spacer(modifier = Modifier.width(8.dp))
+                } else if(!question.question.correct && question.question.attempted) {
+                    Icon(Icons.Filled.Close, modifier = Modifier.drawBehind {
+                        drawCircle(Color(0xFFEB9C9C), radius = (size.minDimension / 2F))
+                    }, contentDescription = null, tint = Color(0xFFB63838))
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                Text(text = question.question.topic, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = question.question.difficulty)
+            }
+            Text(
+                question.questionAnnotatedString.first,
+                inlineContent = question.questionAnnotatedString.second,
+                lineHeight = 32.sp,
+            )
+            Row(
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Button(onClick = {
+                    answerRevealed = !answerRevealed
+                }) {
+                    Text(text = if (answerRevealed) "Hide answer" else "Reveal answer")
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = {
+                    navController.navigate("${Screen.Scratchpad.route}/${question.question.uid}")
+                }) {
+                    Icon(Icons.Filled.Draw, contentDescription = null)
+                }
+                IconButton(onClick = {
+                    homeViewModel.flagQuestion(context, question, !question.question.flagged)
+                }) {
+                    Icon(Icons.Filled.Flag, contentDescription = null, tint = if (question.question.flagged) Color(0xFFB63838) else LocalContentColor.current)
+                }
+            }
+            if (answerRevealed) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    question.answerAnnotatedString.first,
+                    inlineContent = question.answerAnnotatedString.second
+                )
+                Row {
+                    IconButton(onClick = {
+                        homeViewModel.markQuestionResult(context, question, true)
+                    }) {
+                        Icon(Icons.Filled.Check, contentDescription = null, tint = if(question.question.correct && question.question.attempted) Color(
+                            0xFF38B63E
+                        ) else Color.Gray)
+                    }
+                    IconButton(onClick = {
+                        homeViewModel.markQuestionResult(context, question, false)
+                    }) {
+                        Icon(Icons.Filled.Close, contentDescription = null, tint = if(!question.question.correct && question.question.attempted) Color(0xFFB63838) else Color.Gray)
+                    }
+                }
+            }
+        }
+    }
 }
