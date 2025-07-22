@@ -1,18 +1,19 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.devtools.ksp")
 }
 
 android {
     namespace = "app.linkbac.fmd"
-    compileSdk = 33
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "app.linkbac.fmd"
         minSdk = 30
-        targetSdk = 33
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -49,7 +50,7 @@ android {
 }
 
 dependencies {
-    val room_version = "2.5.2"
+    val room_version = "2.7.2"
 
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
