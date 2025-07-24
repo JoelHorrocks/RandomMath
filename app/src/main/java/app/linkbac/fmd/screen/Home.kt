@@ -24,19 +24,23 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Draw
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -220,8 +224,22 @@ fun QuestionCard(question: ProcessedQuestion, navController: NavController, home
                     }, contentDescription = null, tint = Color(0xFFB63838))
                     Spacer(modifier = Modifier.width(8.dp))
                 }
+                // TODO: split topic names from section in API
                 Text(text = question.question.topic, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.weight(1f))
+            }
+            Row(
+                modifier = Modifier.background(Color(
+                    when(question.question.difficulty) {
+                        "Easy" -> 0xFFABE294
+                        "Medium" -> 0xFFEBD99B
+                        "Hard" -> 0xFFEB9C9C
+                        else -> {0x00FFFFFF}
+                    }
+                ), RoundedCornerShape(32.dp)).padding(vertical = 4.dp, horizontal = 8.dp)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.TrendingUp, null)
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(text = question.question.difficulty)
             }
             Text(
