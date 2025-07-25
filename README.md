@@ -12,6 +12,10 @@ A work-in-progress app that presents daily A Level maths problems for revision.
 
 Test the API at https://storeimg.com/fmdaily/.
 
+## 3rd Party Libraries
+
+LaTeX rendered with [ReTeX](https://github.com/himamis/ReTeX/tree/master), renderer under [this](https://github.com/JoelHorrocks/RandomMath/tree/main/app/src/main/java/com/himamis/retex/renderer/LICENSE) license and fonts under [these](https://github.com/JoelHorrocks/RandomMath/tree/main/app/src/main/assets/fonts/licences) licenses.
+
 ## Status
 
 - [x] Load questions from API
